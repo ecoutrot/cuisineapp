@@ -1,0 +1,184 @@
+@api_HostAddress = http://localhost:5266
+
+GET {{api_HostAddress}}/recipes
+Accept: application/json
+
+###
+
+GET {{api_HostAddress}}/requete/
+Accept: application/json
+
+
+###
+
+GET {{api_HostAddress}}/recipes/934368a2-b482-4fe7-b6b7-d6e74c87d417
+Accept: application/json
+
+###
+POST {{api_HostAddress}}/recipeCategories
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Base"
+}
+
+###
+POST {{api_HostAddress}}/recipes
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": "71096544-17c6-4f69-bc9c-645ffb38e7e0",
+    "name": "Quiche lorraine",
+    "description": null,
+    "recipeIngredients": [
+        {
+            "id": null,
+            "unitId": null,
+            "quantity": 5,
+            "ingredientId": "6b75a44a-494e-4540-bdc1-f41227343fa8"
+        },
+        {
+            "id": null,
+            "unitId": "94dd7a8e-f7a8-4f07-be26-41fde9e282a8",
+            "quantity": 0,
+            "ingredientId": "87871096-5b60-45c7-b21f-836ff5367341"
+        },
+        {
+            "id": null,
+            "unitId": "9cd2d120-c21a-45e9-a262-d2123dd8d3c0",
+            "quantity": 125,
+            "ingredientId": "8fb482bc-3327-4aea-8720-c49cc5f3d2e6"
+        },
+        {
+            "id": null,
+            "unitId": "9cd2d120-c21a-45e9-a262-d2123dd8d3c0",
+            "quantity": 250,
+            "ingredientId": "91ca5e3b-1b16-4737-a982-b56e230c979b"
+        },
+        {
+            "id": null,
+            "unitId": null,
+            "quantity": 0,
+            "ingredientId": "f3003b80-66e6-4a80-a840-34b821cfbaca"
+        },
+        {
+            "id": "7d2dfe6c-a8d5-4303-bc50-4017b5d594c1",
+            "unitId": "9cd2d120-c21a-45e9-a262-d2123dd8d3c0",
+            "quantity": 250,
+            "ingredientId": "f4c2ad4a-c95c-44b3-8bbd-d65ab613a1e3"
+        }
+    ],
+    "steps": [
+        "Préparez la pâte brisée avec la farine, le beurre, un œuf, une demi-cuillère à café de sel et un peu d’eau très froide, pour bien amalgamer la pâte. Pétrissez-la assez peu et roulez-la en boule enveloppée d’un film alimentaire.\nLaissez-la reposer une heure dans le bas du frigidaire.\nDétailler le lard en lardons en ôtant les couennes et les os éventuels.\nFaites les blanchir dans un grand volume d’eau bouillante cinq minutes (uniquement si c’est du lard maison ou traditionnel).\nEgouttez, essuyez au besoin et faites rissoler légèrement avec 10 g de beurre.\nEgouttez et réservez.",
+        "Beurrez et farinez un moule à tarte de 24 cm environ.\nAbaissez la pâte sur 4 à 5 mm d’épaisseur. Garnissez le moule et piquez avec une fourchette le fond du plateau.\nEparpillez des haricots secs et cuire à blanc à 200°C une dizaine de minutes (pour une quiche bien croustillante).\nRetirez du four, ôtez les haricots et éparpillez les lardons.\nBattre 4 œufs en omelette et ajoutez la crème fraîche, salez modérément, poivrez et mettez la muscade râpée.\nVerser sur les lardons et cuire au four à 200°C pendant 30 minutes. Elle doit encore être tremblotante au milieu. Suivant les fours, il se peut que cela soit légèrement plus long à cuire.\nOn peut aussi passer l’étape de la cuisson à blanc en cuisant le tout directement, mais la pâte sera moins croustillante.\nServir très chaud."
+    ],
+    "recipeCategoryId": null,
+    "recipeCategory": null,
+    "preparationTime": 0,
+    "cookingTime": 0,
+    "restTime": 0,
+    "portions": 0,
+    "difficulty": 0,
+    "price": 0,
+    "cookingType": 1,
+    "calories": 0,
+    "advice": null,
+    "userId": null
+}
+
+###
+
+PUT {{api_HostAddress}}/recipes/71096544-17c6-4f69-bc9c-645ffb38e7e0
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": "71096544-17c6-4f69-bc9c-645ffb38e7e0",
+    "name": "Quiche lorraine",
+    "description": null,
+    "recipeIngredients": [
+        {
+            "id": null,
+            "unitId": null,
+            "quantity": 5,
+            "ingredientId": "6b75a44a-494e-4540-bdc1-f41227343fa8"
+        },
+        {
+            "id": null,
+            "unitId": "94dd7a8e-f7a8-4f07-be26-41fde9e282a8",
+            "quantity": 0,
+            "ingredientId": "87871096-5b60-45c7-b21f-836ff5367341"
+        },
+        {
+            "id": null,
+            "unitId": "9cd2d120-c21a-45e9-a262-d2123dd8d3c0",
+            "quantity": 125,
+            "ingredientId": "8fb482bc-3327-4aea-8720-c49cc5f3d2e6"
+        },
+        {
+            "id": null,
+            "unitId": "9cd2d120-c21a-45e9-a262-d2123dd8d3c0",
+            "quantity": 250,
+            "ingredientId": "91ca5e3b-1b16-4737-a982-b56e230c979b"
+        },
+        {
+            "id": null,
+            "unitId": null,
+            "quantity": 0,
+            "ingredientId": "f3003b80-66e6-4a80-a840-34b821cfbaca"
+        },
+        {
+            "id": "7d2dfe6c-a8d5-4303-bc50-4017b5d594c1",
+            "unitId": "9cd2d120-c21a-45e9-a262-d2123dd8d3c0",
+            "quantity": 250,
+            "ingredientId": "f4c2ad4a-c95c-44b3-8bbd-d65ab613a1e3"
+        }
+    ],
+    "steps": [
+        "Préparez la pâte brisée avec la farine, le beurre, un œuf, une demi-cuillère à café de sel et un peu d’eau très froide, pour bien amalgamer la pâte. Pétrissez-la assez peu et roulez-la en boule enveloppée d’un film alimentaire.\nLaissez-la reposer une heure dans le bas du frigidaire.\nDétailler le lard en lardons en ôtant les couennes et les os éventuels.\nFaites les blanchir dans un grand volume d’eau bouillante cinq minutes (uniquement si c’est du lard maison ou traditionnel).\nEgouttez, essuyez au besoin et faites rissoler légèrement avec 10 g de beurre.\nEgouttez et réservez.",
+        "Beurrez et farinez un moule à tarte de 24 cm environ.\nAbaissez la pâte sur 4 à 5 mm d’épaisseur. Garnissez le moule et piquez avec une fourchette le fond du plateau.\nEparpillez des haricots secs et cuire à blanc à 200°C une dizaine de minutes (pour une quiche bien croustillante).\nRetirez du four, ôtez les haricots et éparpillez les lardons.\nBattre 4 œufs en omelette et ajoutez la crème fraîche, salez modérément, poivrez et mettez la muscade râpée.\nVerser sur les lardons et cuire au four à 200°C pendant 30 minutes. Elle doit encore être tremblotante au milieu. Suivant les fours, il se peut que cela soit légèrement plus long à cuire.\nOn peut aussi passer l’étape de la cuisson à blanc en cuisant le tout directement, mais la pâte sera moins croustillante.\nServir très chaud."
+    ],
+    "recipeCategoryId": null,
+    "recipeCategory": null,
+    "preparationTime": 0,
+    "cookingTime": 0,
+    "restTime": 0,
+    "portions": 0,
+    "difficulty": 0,
+    "price": 0,
+    "cookingType": 1,
+    "calories": 0,
+    "advice": null,
+    "userId": null
+}
+
+###
+
+DELETE {{api_HostAddress}}/recipes/ceba8901-5744-40f4-a9a0-c01753170a50
+Accept: application/json
+
+###
+
+GET {{api_HostAddress}}/ingredients/
+Accept: application/json
+
+###
+
+GET {{api_HostAddress}}/units/
+Accept: application/json
+
+
+###
+POST {{api_HostAddress}}/units
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "kg"
+}
+
+###
+GET {{api_HostAddress}}/requete/a/0
+Accept: application/json

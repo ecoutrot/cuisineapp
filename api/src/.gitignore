@@ -1,0 +1,38 @@
+project-structure.txt
+
+*.db-shm
+*.db-wal
+*.db-journal
+*.lock
+*.log
+*.log.*
+*.log-*
+
+appsettings.Development.json
+appsettings.Production.json
+
+### react ###
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+
+*.sublime*
+
+psd
+thumb
+sketch
+
+### DotnetCore ###
+# .NET Core build folders
+bin/
+obj/
+
+# Common node modules locations
+/node_modules
+/wwwroot/node_modules
+.vs
