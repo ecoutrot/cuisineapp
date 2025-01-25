@@ -159,7 +159,7 @@ public class AuthRepository(UserDbContext context, IConfiguration configuration)
         }
         catch (Exception)
         {
-            return null;
+            throw new Exception(nameof(GenerateAndSaveRefreshTokenAsync));
         }
     }
 

@@ -1,6 +1,5 @@
 using Cuisine.Application.Interfaces;
 using Cuisine.Application.DTOs;
-using Cuisine.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
 namespace Cuisine.Application.Services;

@@ -1,5 +1,4 @@
 using Cuisine.Application.DTOs;
-using Cuisine.Domain.Entities;
 using Cuisine.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
