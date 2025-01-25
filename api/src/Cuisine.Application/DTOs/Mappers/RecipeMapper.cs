@@ -8,25 +8,24 @@ public static class RecipeMapper
     public static RecipeDTO ToRecipeDTO(this Recipe recipe)
     {
         return new RecipeDTO
-        (
-            recipe.Id,
-            recipe.Name,
-            recipe.Description,
-            recipe.RecipeIngredients?.Select(ri => ri.ToRecipeIngredientDTO()).ToList(),
-            (recipe.Steps != null) ? JsonSerializer.Deserialize<List<string>>(recipe.Steps) : null,
-            recipe.RecipeCategoryId,
-            recipe.RecipeCategory?.Name,
-            recipe.PreparationTime,
-            recipe.CookingTime,
-            recipe.RestTime,
-            recipe.Portions,
-            recipe.Difficulty,
-            recipe.Price,
-            recipe.CookingType,
-            recipe.Calories,
-            recipe.Advice,
-            recipe.UserId
-        );
+        {
+            Id = recipe.Id,
+            Name = recipe.Name,
+            Description = recipe.Description,
+            RecipeIngredients = recipe.RecipeIngredients?.Select(ri => ri.ToRecipeIngredientDTO()).ToList(),
+            Steps = JsonSerializer.Deserialize<List<string>>(recipe.Steps ?? string.Empty),
+            RecipeCategoryId = recipe.RecipeCategoryId,
+            PreparationTime = recipe.PreparationTime,
+            CookingTime = recipe.CookingTime,
+            RestTime = recipe.RestTime,
+            Portions = recipe.Portions,
+            Difficulty = recipe.Difficulty,
+            Price = recipe.Price,
+            CookingType = recipe.CookingType,
+            Calories = recipe.Calories,
+            Advice = recipe.Advice,
+            UserId = recipe.UserId
+        };
     }
 
     public static Recipe ToEntity(this RecipeDTO recipeDTO)
@@ -49,6 +48,29 @@ public static class RecipeMapper
             Calories = recipeDTO.Calories,
             Advice = recipeDTO.Advice,
             UserId = recipeDTO.UserId
+        };
+    }
+
+    public static Recipe ToNewEntity(this NewRecipeDTO newRecipeDTO)
+    {
+        return new Recipe
+        {
+            Id = Guid.NewGuid(),
+            Name = newRecipeDTO.Name,
+            Description = newRecipeDTO.Description,
+            RecipeIngredients = newRecipeDTO.RecipeIngredients?.Select(ri => ri.ToNewEntity()).ToList(),
+            Steps = JsonSerializer.Serialize(newRecipeDTO.Steps),
+            RecipeCategoryId = newRecipeDTO.RecipeCategoryId,
+            PreparationTime = newRecipeDTO.PreparationTime,
+            CookingTime = newRecipeDTO.CookingTime,
+            RestTime = newRecipeDTO.RestTime,
+            Portions = newRecipeDTO.Portions,
+            Difficulty = newRecipeDTO.Difficulty,
+            Price = newRecipeDTO.Price,
+            CookingType = newRecipeDTO.CookingType,
+            Calories = newRecipeDTO.Calories,
+            Advice = newRecipeDTO.Advice,
+            UserId = newRecipeDTO.UserId
         };
     }
 

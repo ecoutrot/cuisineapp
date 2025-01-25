@@ -7,10 +7,10 @@ public static class RecipeCategoryMapper
     public static RecipeCategoryDTO ToRecipeCategoryDTO(this RecipeCategory recipeCategory)
     {
         return new RecipeCategoryDTO
-        (
-            recipeCategory.Id,
-            recipeCategory.Name
-        );
+        {
+            Id = recipeCategory.Id,
+            Name = recipeCategory.Name
+        };
     }
 
     public static RecipeCategory ToEntity(this RecipeCategoryDTO recipeCategoryDTO)
@@ -19,6 +19,15 @@ public static class RecipeCategoryMapper
         {
             Id = recipeCategoryDTO.Id,
             Name = recipeCategoryDTO.Name,
+        };
+    }
+
+    public static RecipeCategory ToNewEntity(this NewRecipeCategoryDTO newRecipeCategoryDTO)
+    {
+        return new RecipeCategory
+        {
+            Id = Guid.NewGuid(),
+            Name = newRecipeCategoryDTO.Name,
         };
     }
 }

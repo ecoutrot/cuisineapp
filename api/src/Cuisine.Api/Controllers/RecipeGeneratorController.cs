@@ -3,55 +3,83 @@ using Cuisine.Application.DTOs;
 using Cuisine.Application.Interfaces;
 using Cuisine.Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 
 [ApiController]
 [Authorize]
+[ValidateInputs]
 [Route("api/[controller]")]
 public class RecipeGeneratorController(GeminiApiService geminiApiService, IConfiguration configuration, IPromptService promptService) : ControllerBase
 {
+    /// <summary>
+    /// Action filter that could be added either on method or controller to ensure that Model state validation method is called before executing
+    /// </summary>
+    public class ValidateInputsAttribute : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.ModelState.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }
+        }
+    }
 
     [HttpPost("idea")]
-    public async Task<ActionResult<RecipeDTO>> GenerateContentIdea([FromBody] string idea)
+    public async Task<Results<Ok<NewRecipeDTO>,BadRequest<string>>> GenerateContentIdea([FromBody] string idea)
     {
-        var apiKey = configuration["ApiKeys:GeminiApiKey"] ?? "";
-
-        var prompt = promptService.PromoptIdea(idea);
-        
-        var result = await geminiApiService.GenerateContentAsync(apiKey, prompt);
-
-        return Ok(result);
+        try
+        {
+            var apiKey = configuration["ApiKeys:GeminiApiKey"] ?? "";
+            var prompt = promptService.PromoptIdea(idea);
+            var result = await geminiApiService.GenerateContentAsync(apiKey, prompt);
+            return TypedResults.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("list")]
-    public async Task<ActionResult<RecipeDTO>> GenerateContentList([FromBody] string[] listIngredients)
+    public async Task<Results<Ok<NewRecipeDTO>,BadRequest<string>>> GenerateContentList([FromBody] string[] listIngredients)
     {
-        var apiKey = configuration["ApiKeys:GeminiApiKey"] ?? "";
-
-        var prompt = promptService.PromptListIngredients(listIngredients);
-
-        var result = await geminiApiService.GenerateContentAsync(apiKey, prompt);
-
-        return Ok(result);
+        try
+        {
+            var apiKey = configuration["ApiKeys:GeminiApiKey"] ?? "";
+            var prompt = promptService.PromptListIngredients(listIngredients);
+            var result = await geminiApiService.GenerateContentAsync(apiKey, prompt);
+            return TypedResults.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
 
     [HttpGet("improve/{id:guid}")]
-    public async Task<ActionResult<RecipeDTO>> GenerateContentImprove([FromRoute] Guid id)
+    public async Task<Results<Ok<NewRecipeDTO>,BadRequest<string>>> GenerateContentImprove([FromRoute] Guid id)
     {
-        var apiKey = configuration["ApiKeys:GeminiApiKey"] ?? "";
-
-        var prompt = await promptService.PromptImproveAsync(id);
-        
-        var result = await geminiApiService.GenerateContentAsync(apiKey, prompt);
-
-        return Ok(result);
+        try
+        {
+            var apiKey = configuration["ApiKeys:GeminiApiKey"] ?? "";
+            var prompt = await promptService.PromptImproveAsync(id);
+            var result = await geminiApiService.GenerateContentAsync(apiKey, prompt);
+            return TypedResults.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
 
     /* [HttpPost("image")]
-    public async Task<ActionResult<RecipeDTO>> GenerateContentImage([FromForm] string title, [FromForm] IFormFile image)
+    public async Task<ActionResult<NewRecipeDTO>> GenerateContentImage([FromForm] string title, [FromForm] IFormFile image)
     {
         if (image == null || string.IsNullOrEmpty(title))
         {

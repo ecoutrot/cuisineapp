@@ -8,7 +8,14 @@ public class UserRepository(UserDbContext context): IUserRepository
 {
     public async Task<User?> GetUserByIdAsync(Guid id)
     {
-        var user = await context.Users.FindAsync(id);
-        return user;
+        try
+        {
+            var user = await context.Users.FindAsync(id);
+            return user;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

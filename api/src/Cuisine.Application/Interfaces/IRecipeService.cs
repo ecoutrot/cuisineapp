@@ -8,5 +8,5 @@ public interface IRecipeService
     public Task<Recipe?> GetRecipeByIdAsync(Guid id);
     public Task<Recipe?> AddRecipeAsync(Recipe recipe);
     public Task<Recipe?> UpdateRecipeAsync(Guid id, Recipe recipe);
-    public Task DeleteRecipeAsync(Guid id);
+    public Task DeleteRecipeAsync(Guid userId, Guid id);
 }

@@ -4,7 +4,7 @@ namespace Cuisine.Domain.Entities;
 
 public class RecipeIngredient
 {
-    public Guid? Id { get; set; } = Guid.NewGuid();
+    public required Guid Id { get; set; }
     public Guid? RecipeId { get; set; }
     public Recipe? Recipe { get; set; }
     public Guid IngredientId { get; set; }

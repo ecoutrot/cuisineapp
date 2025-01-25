@@ -7,10 +7,10 @@ public static class UnitMapper
     public static UnitDTO ToUnitDTO(this Unit unit)
     {
         return new UnitDTO
-        (
-            unit.Id,
-            unit.Name
-        );
+        {
+            Id = unit.Id,
+            Name = unit.Name
+        };
     }
 
     public static Unit ToEntity(this UnitDTO unitDTO)
@@ -19,6 +19,15 @@ public static class UnitMapper
         {
             Id = unitDTO.Id,
             Name = unitDTO.Name,
+        };
+    }
+
+    public static Unit ToNewEntity(this NewUnitDTO newUnitDTO)
+    {
+        return new Unit
+        {
+            Id = Guid.NewGuid(),
+            Name = newUnitDTO.Name,
         };
     }
 }

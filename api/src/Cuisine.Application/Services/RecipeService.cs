@@ -11,9 +11,9 @@ public class RecipeService(IRecipeRepository recipeRepository) : IRecipeService
         return addedRecipe;
     }
 
-    public async Task DeleteRecipeAsync(Guid id)
+    public async Task DeleteRecipeAsync(Guid userId, Guid id)
     {
-        await recipeRepository.DeleteRecipeAsync(id);
+       await recipeRepository.DeleteRecipeAsync(userId, id);
     }
 
     public async Task<List<Recipe>?> GetRecipesAsync(Guid userId, int? page = null, int? limit = null, string? search = null)

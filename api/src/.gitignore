@@ -1,15 +1,8 @@
 project-structure.txt
-
-*.db-shm
-*.db-wal
-*.db-journal
 *.lock
 *.log
 *.log.*
 *.log-*
-
-appsettings.Development.json
-appsettings.Production.json
 
 ### react ###
 .DS_*

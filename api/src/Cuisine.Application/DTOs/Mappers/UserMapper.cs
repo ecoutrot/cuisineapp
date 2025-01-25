@@ -7,10 +7,10 @@ public static class UserMapper
     public static UserDTO ToUserDTO(this User user)
     {
         return new UserDTO
-        (
-            user.Id,
-            user.Username
-        );
+        {
+            Id = user.Id,
+            Username = user.Username
+        };
     }
 
     public static User ToEntity(this UserDTO userDTO)
@@ -19,6 +19,15 @@ public static class UserMapper
         {
             Id = userDTO.Id,
             Username = userDTO.Username ?? string.Empty,
+        };
+    }
+
+    public static User ToNewEntity(this NewUserDTO newUserDTO)
+    {
+        return new User
+        {
+            Id = Guid.NewGuid(),
+            Username = newUserDTO.Username,
         };
     }
 }

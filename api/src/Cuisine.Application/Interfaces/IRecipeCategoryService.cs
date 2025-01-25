@@ -1,4 +1,3 @@
-
 using Cuisine.Domain.Entities;
 
 namespace Cuisine.Application.Interfaces;

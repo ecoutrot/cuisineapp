@@ -6,7 +6,7 @@ namespace Cuisine.Application.Interfaces;
 
 public interface IAuthService
 {
-    Task<User?> RegisterAsync(UserLoginDTO userLoginDTO);
+    Task<TokenDto?> RegisterAsync(UserLoginDTO userLoginDTO);
     Task<TokenDto?> LoginAsync(UserLoginDTO userLoginDTO);
     Task<TokenDto?> RefreshTokensAsync(RefreshTokenRequestDto refreshTokenRequestDto);
     Task RemoveRefreshTokenAsync(Guid? userId, string? refreshToken);

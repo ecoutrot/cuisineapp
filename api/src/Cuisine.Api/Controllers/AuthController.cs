@@ -4,87 +4,147 @@ using Cuisine.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Cuisine.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[ValidateInputs]
+[Route("api/[controller]")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
-    [Authorize]
-    [HttpPost("register")]
-    public async Task<ActionResult<User>> Register(UserLoginDTO userLoginDTO)
+    /// <summary>
+    /// Action filter that could be added either on method or controller to ensure that Model state validation method is called before executing
+    /// </summary>
+    public class ValidateInputsAttribute : ActionFilterAttribute
     {
-        var user = await authService.RegisterAsync(userLoginDTO);
-        if (user is null)
-            return BadRequest("Username already exists.");
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.ModelState.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }
+        }
+    }
 
-        return Ok(user);
+    [HttpPost("register")]
+    public async Task<Results<Ok<TokenResponseDto>, BadRequest<string>>> Register(UserLoginDTO userLoginDTO)
+    {
+        try
+        {
+            var user = await authService.RegisterAsync(userLoginDTO);
+            if (user is null)
+                return TypedResults.BadRequest("Username already exists.");
+            var result = await authService.LoginAsync(userLoginDTO);
+            if (result is null)
+                return TypedResults.BadRequest("Invalid username or password.");
+            authService.SetTokenCookie(result, HttpContext);
+            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDto);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<TokenResponseDto>> Login(UserLoginDTO userLoginDTO)
+    public async Task<Results<Ok<TokenResponseDto>, BadRequest<string>>> Login(UserLoginDTO userLoginDTO)
     {
-        var result = await authService.LoginAsync(userLoginDTO);
-        if (result is null)
-            return BadRequest("Invalid username or password.");
+        try
+        {
+            var result = await authService.LoginAsync(userLoginDTO);
+            if (result is null)
+                return TypedResults.BadRequest("Invalid username or password.");
 
-        authService.SetTokenCookie(result, HttpContext);
-
-        return Ok(result.AccessToken);
+            authService.SetTokenCookie(result, HttpContext);
+            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDto);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<TokenResponseDto>> RefreshToken()
+    public async Task<Results<Ok<TokenResponseDto>, BadRequest<string>>> RefreshToken()
     {
-        Request.Cookies.TryGetValue("userId", out var userId);
-        Request.Cookies.TryGetValue("refreshToken", out var refreshToken);
-        if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(userId))
+        try
         {
-            authService.RemoveTokenCookie(HttpContext);
-            return BadRequest("Invalid refresh token.");
+            Request.Cookies.TryGetValue("userId", out var userId);
+            Request.Cookies.TryGetValue("refreshToken", out var refreshToken);
+            if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(userId))
+            {
+                authService.RemoveTokenCookie(HttpContext);
+                return TypedResults.BadRequest("Invalid refresh token.");
+            }
+            var refreshTokenRequestDto = new RefreshTokenRequestDto()
+            {
+                UserId = new Guid(userId),
+                RefreshToken = refreshToken
+            };
+            var result = await authService.RefreshTokensAsync(refreshTokenRequestDto);
+            if (result is null || result.AccessToken is null || result.RefreshToken is null)
+            {
+                authService.RemoveTokenCookie(HttpContext);
+                return TypedResults.BadRequest("Invalid refresh token.");
+            }
+            authService.SetTokenCookie(result, HttpContext);
+            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDto);
         }
-        var refreshTokenRequestDto = new RefreshTokenRequestDto(new Guid(userId), refreshToken);
-        var result = await authService.RefreshTokensAsync(refreshTokenRequestDto);
-        if (result is null || result.AccessToken is null || result.RefreshToken is null)
+        catch (Exception ex)
         {
-            authService.RemoveTokenCookie(HttpContext);
-            return BadRequest("Invalid refresh token.");
+            return TypedResults.BadRequest(ex.Message);
         }
-        authService.SetTokenCookie(result, HttpContext);
-        return Ok(result.AccessToken);
     }
 
     [Authorize]
     [HttpPost("passwordchange")]
-    public async Task<ActionResult<TokenResponseDto>> PasswordChange(PasswordDTO passwordDTO)
+    public async Task<Results<Ok<TokenResponseDto>,UnauthorizedHttpResult,BadRequest<string>>> PasswordChange(PasswordDTO passwordDTO)
     {
-        var userId = GetUserId(User);
-        if (userId is null)
+        try
         {
-            return Unauthorized();
+            var userId = GetUserId(User);
+            if (userId is null)
+            {
+                return TypedResults.Unauthorized();
+            }
+            var result = await authService.ChangePasswordAsync(passwordDTO.OldPassword, passwordDTO.NewPassword, userId.Value);
+            if (result is null)
+                return TypedResults.BadRequest("Password change failed.");
+
+            authService.SetTokenCookie(result, HttpContext);
+            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDto);
         }
-        var result = await authService.ChangePasswordAsync(passwordDTO.oldPassword, passwordDTO.newPassword, userId.Value);
-        if (result is null)
-            return BadRequest("Password change failed.");
-
-        authService.SetTokenCookie(result, HttpContext);
-
-        return Ok(result.AccessToken);
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
+    public async Task<Results<Ok<string>,BadRequest<string>>> Logout()
     {
-        var userId = Request.Cookies["userId"];
-        Response.Cookies.Delete("userId");
-        var refreshToken = Request.Cookies["refreshToken"];
-        Response.Cookies.Delete("refreshToken");
-        if (!string.IsNullOrEmpty(userId))
+        try
         {
-            await authService.RemoveRefreshTokenAsync(new Guid(userId), refreshToken);
+            var userId = Request.Cookies["userId"];
+            Response.Cookies.Delete("userId");
+            var refreshToken = Request.Cookies["refreshToken"];
+            Response.Cookies.Delete("refreshToken");
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await authService.RemoveRefreshTokenAsync(new Guid(userId), refreshToken);
+            }
+            return TypedResults.Ok("Logged out");
         }
-        return Ok("Logged out");
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
     private static Guid? GetUserId(ClaimsPrincipal claimsPrincipal)

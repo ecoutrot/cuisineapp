@@ -1,74 +1,114 @@
 using Cuisine.Application.DTOs;
 using Cuisine.Application.DTOs.Mappers;
 using Cuisine.Application.Interfaces;
-using Cuisine.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Cuisine.Api.Controllers;
 
 [ApiController]
 [Authorize]
+[ValidateInputs]
 [Route("api/[controller]")]
 public class IngredientsController(IIngredientService ingredientService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<IngredientDTO[]>> GetAll(int? page = null, int? limit = null, string? search = null)
+    /// <summary>
+    /// Action filter that could be added either on method or controller to ensure that Model state validation method is called before executing
+    /// </summary>
+    public class ValidateInputsAttribute : ActionFilterAttribute
     {
-        var ingredients = await ingredientService.GetIngredientsAsync(page, limit, search);
-        var ingredientDTOs = ingredients?.Select(ingredient => ingredient.ToIngredientDTO()).ToArray();
-        return Ok(ingredientDTOs ?? Array.Empty<IngredientDTO>());
-    }
-
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<IngredientDTO>> GetById([FromRoute] Guid id)
-    {
-        var ingredient = await ingredientService.GetIngredientByIdAsync(id);
-        if (ingredient is null)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            return NotFound();
+            if (!context.ModelState.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }
         }
-        var ingredientDTO = ingredient.ToIngredientDTO();
-        return Ok(ingredientDTO);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<IngredientDTO>> Add([FromBody] IngredientDTO ingredientDTO)
+    [HttpGet]
+    public async Task<Results<Ok<IngredientDTO[]>,BadRequest<string>>> GetAll(int? page = null, int? limit = null, string? search = null)
     {
         try
         {
-            var ingredient = ingredientDTO.ToEntity();
-            var addedIngredient = await ingredientService.AddIngredientAsync(ingredient);
-            var addedIngredientDTO = addedIngredient?.ToIngredientDTO();
-            return CreatedAtAction(nameof(GetById), new { id = addedIngredientDTO?.Id }, addedIngredientDTO);
-        }
-        catch (AlreadyExistsException ex)
-        {
-            return StatusCode(StatusCodes.Status409Conflict, new { error = ex.Message });
+            var ingredients = await ingredientService.GetIngredientsAsync(page, limit, search);
+            var ingredientDTOs = ingredients?.Select(ingredient => ingredient.ToIngredientDTO()).ToArray();
+            return TypedResults.Ok(ingredientDTOs ?? []);
         }
         catch (Exception ex)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { Error = ex.Message });
+            return TypedResults.BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<Results<Ok<IngredientDTO>,NotFound,BadRequest<string>>> GetById([FromRoute] Guid id)
+    {
+        try
+        {
+            var ingredient = await ingredientService.GetIngredientByIdAsync(id);
+            if (ingredient is null)
+            {
+                return TypedResults.NotFound();
+            }
+            var ingredientDTO = ingredient.ToIngredientDTO();
+            return TypedResults.Ok(ingredientDTO);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost]
+    public async Task<Results<Created<IngredientDTO>,BadRequest<string>>> Add([FromBody] NewIngredientDTO newIngredientDTO)
+    {
+        try
+        {
+            var ingredient = newIngredientDTO.ToNewEntity();
+            var addedIngredient = await ingredientService.AddIngredientAsync(ingredient);
+            var addedIngredientDTO = addedIngredient?.ToIngredientDTO();
+            return TypedResults.Created(nameof(GetById), addedIngredientDTO);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
         }
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<IngredientDTO>> Update([FromRoute] Guid id, [FromBody] IngredientDTO ingredientDTO)
+    public async Task<Results<Ok<IngredientDTO>,NotFound,BadRequest<string>>> Update([FromRoute] Guid id, [FromBody] IngredientDTO ingredientDTO)
     {
-        var ingredient = ingredientDTO.ToEntity();
-        var updatedIngredient = await ingredientService.UpdateIngredientAsync(id, ingredient);
-        if (updatedIngredient is null)
+        try
         {
-            return NotFound();
+            var ingredient = ingredientDTO.ToEntity();
+            var updatedIngredient = await ingredientService.UpdateIngredientAsync(id, ingredient);
+            if (updatedIngredient is null)
+            {
+                return TypedResults.NotFound();
+            }
+            var updatedIngredientDTO = updatedIngredient.ToIngredientDTO();
+            return TypedResults.Ok(updatedIngredientDTO);
         }
-        var updatedIngredientDTO = updatedIngredient.ToIngredientDTO();
-        return Ok(updatedIngredientDTO);
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> Delete([FromRoute] Guid id)
+    public async Task<Results<NoContent,BadRequest<string>>> Delete([FromRoute] Guid id)
     {
-        await ingredientService.DeleteIngredientAsync(id);
-        return NoContent();
+        try
+        {
+            await ingredientService.DeleteIngredientAsync(id);
+            return TypedResults.NoContent();
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 }

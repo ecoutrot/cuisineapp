@@ -7,11 +7,11 @@ public static class IngredientMapper
     public static IngredientDTO ToIngredientDTO(this Ingredient ingredient)
     {
         return new IngredientDTO
-        (
-            ingredient.Id,
-            ingredient.Name,
-            ingredient.Description
-        );
+        {
+            Id = ingredient.Id,
+            Name = ingredient.Name,
+            Description = ingredient.Description,
+        };
     }
 
     public static Ingredient ToEntity(this IngredientDTO ingredientDTO)
@@ -21,6 +21,16 @@ public static class IngredientMapper
             Id = ingredientDTO.Id,
             Name = ingredientDTO.Name,
             Description = ingredientDTO.Description,
+        };
+    }
+
+    public static Ingredient ToNewEntity(this NewIngredientDTO newIngredientDTO)
+    {
+        return new Ingredient
+        {
+            Id = Guid.NewGuid(),
+            Name = newIngredientDTO.Name,
+            Description = newIngredientDTO.Description,
         };
     }
 }

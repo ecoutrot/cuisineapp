@@ -1,6 +1,5 @@
 
 using Cuisine.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cuisine.Infrastructure.Persistence.Data;
@@ -58,13 +57,5 @@ public class UserDbContext(DbContextOptions<UserDbContext> options) : DbContext(
             .HasForeignKey(i => i.IngredientCategoryId)
             .OnDelete(DeleteBehavior.SetNull);
         
-        /* var user = new User();
-        modelBuilder.Entity<User>().HasData(new User
-        {
-            Id = Guid.NewGuid(),
-            Username = "Edwin",
-            PasswordHash = new PasswordHasher<User>().HashPassword(user, "edwin"),
-            Role = "Admin"
-        }); */
     }
 }

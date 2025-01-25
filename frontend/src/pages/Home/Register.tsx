@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchForAccessToken, fetchForRegister } from "../../services/Auth";
+import { fetchForRegister } from "../../services/Auth";
 import CuisineInputText from "../../components/Forms/CuisineInputText";
 import CuisineInputPassword from "../../components/Forms/CuisineInputPassword";
 import Spinner from "../../components/Elements/Spinner";
@@ -28,21 +28,14 @@ function Register() {
     const credentials = { username: formUsername, password: formPassword };
 
     await fetchForRegister(credentials)
-      .then(async () => {
-        await fetchForAccessToken(credentials)
-          .then(async (token) => {
-            if (!token) {
-              setErrorMessage("Erreur lors de la connexion. Veuillez réessayer.");
-              return;
-            }
-            setToken(token);
-            localStorage.setItem("token", token);
-            await navigate("/");
-          })
-          .catch((error) => {
-            console.error(error);
-            setErrorMessage("Erreur lors de la connexion. Veuillez réessayer.");
-          });
+      .then(async (token) => {
+        if (!token) {
+          setErrorMessage("Erreur lors de la connexion. Veuillez réessayer.");
+          return;
+        }
+        setToken(token.accessToken);
+        localStorage.setItem("token", token.accessToken);
+        await navigate("/");
       })
       .catch((error) => {
         console.error(error);

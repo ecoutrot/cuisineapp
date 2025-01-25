@@ -9,64 +9,95 @@ public class RecipeCategoryRepository(UserDbContext context): IRecipeCategoryRep
 {
     public async Task<RecipeCategory?> AddRecipeCategoryAsync(RecipeCategory recipeCategory)
     {
-        var existingRecipeCategory = await context.RecipeCategories.FirstOrDefaultAsync(r => r.Name == recipeCategory.Name);
-        if (existingRecipeCategory != null)
+        try
         {
-            return existingRecipeCategory;
+            var existingRecipeCategory = await context.RecipeCategories.FirstOrDefaultAsync(r => r.Name == recipeCategory.Name);
+            if (existingRecipeCategory != null)
+            {
+                return existingRecipeCategory;
+            }
+            recipeCategory.Id = Guid.NewGuid();
+            context.RecipeCategories.Add(recipeCategory);
+            await context.SaveChangesAsync();
+            return recipeCategory;
         }
-        recipeCategory.Id = Guid.NewGuid();
-        context.RecipeCategories.Add(recipeCategory);
-        await context.SaveChangesAsync();
-        return recipeCategory;
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public async Task DeleteRecipeCategoryAsync(Guid id)
     {
-        var recipeCategory = await context.RecipeCategories.FirstOrDefaultAsync(r => r.Id == id);
-        if (recipeCategory == null)
+        try
+        {
+            var recipeCategory = await context.RecipeCategories.FirstAsync(r => r.Id == id);
+            context.RecipeCategories.Remove(recipeCategory);
+            await context.SaveChangesAsync();
+        }
+        catch (Exception)
         {
             return;
         }
-        context.RecipeCategories.Remove(recipeCategory);
-        await context.SaveChangesAsync();
     }
 
     public async Task<RecipeCategory?> GetRecipeCategoryByIdAsync(Guid id)
     {
-        var recipeCategory = await context.RecipeCategories.FindAsync(id);
-        return recipeCategory;
+        try
+        {
+            var recipeCategory = await context.RecipeCategories.FindAsync(id);
+            return recipeCategory;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public async Task<List<RecipeCategory>?> GetRecipeCategoriesAsync(int? page = null, int? limit = null)
     {
-        var query = context.RecipeCategories.AsQueryable();
-        query = query.OrderBy(r => r.Name);
-        if (page.HasValue && limit.HasValue)
+        try
         {
-            int skip = (page.Value - 1) * limit.Value;
-            query = query.Skip(skip).Take(limit.Value);
+            var query = context.RecipeCategories.AsQueryable();
+            query = query.OrderBy(r => r.Name);
+            if (page.HasValue && limit.HasValue)
+            {
+                int skip = (page.Value - 1) * limit.Value;
+                query = query.Skip(skip).Take(limit.Value);
+            }
+            return await query.ToListAsync();
         }
-        return await query.ToListAsync();
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public async Task<RecipeCategory?> UpdateRecipeCategoryAsync(Guid id, RecipeCategory recipeCategory)
     {
-        if (id != recipeCategory.Id)
+        try
+        {
+            if (id != recipeCategory.Id)
+            {
+                return null;
+            }
+            var existingRecipeCategory = await context.RecipeCategories.FirstOrDefaultAsync(r => r.Name == recipeCategory.Name);
+            if (existingRecipeCategory != null)
+            {
+                throw new Exception($"Ingredient with Name {existingRecipeCategory.Name} already exists.");
+            }
+            existingRecipeCategory = await context.RecipeCategories.FirstOrDefaultAsync(r => r.Id == recipeCategory.Id);
+            if (existingRecipeCategory == null)
+            {
+                return null;
+            }
+            context.Entry(existingRecipeCategory).CurrentValues.SetValues(recipeCategory);
+            await context.SaveChangesAsync();
+            return existingRecipeCategory;
+        }
+        catch (Exception)
         {
             return null;
         }
-        var existingRecipeCategory = await context.RecipeCategories.FirstOrDefaultAsync(r => r.Name == recipeCategory.Name);
-        if (existingRecipeCategory != null)
-        {
-            throw new Exception($"Ingredient with Name {existingRecipeCategory.Name} already exists.");
-        }
-        existingRecipeCategory = await context.RecipeCategories.FirstOrDefaultAsync(r => r.Id == recipeCategory.Id);
-        if (existingRecipeCategory == null)
-        {
-            return null;
-        }
-        context.Entry(existingRecipeCategory).CurrentValues.SetValues(recipeCategory);
-        await context.SaveChangesAsync();
-        return existingRecipeCategory;
     }
 }

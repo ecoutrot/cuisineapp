@@ -36,8 +36,8 @@ function Login() {
           setIsSubmitting(false);
           return;
         }
-        setToken(token);
-        localStorage.setItem("token", token);
+        setToken(token.accessToken);
+        localStorage.setItem("token", token.accessToken);
         await navigate("/");
       })
       .catch((error) => {

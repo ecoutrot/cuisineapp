@@ -2,7 +2,6 @@
 using Cuisine.Application.Services;
 using Cuisine.Domain.Entities;
 using Moq;
-using Xunit;
 
 namespace Cuisine.Test;
 
@@ -55,13 +54,11 @@ public class UnitServiceTests
         // Arrange
         var units = new List<Unit>
         {
-            new Unit
-            {
+            new() {
                 Id = Guid.NewGuid(),
                 Name = "test1",
             },
-            new Unit
-            {
+            new() {
                 Id = Guid.NewGuid(),
                 Name = "test2",
             }

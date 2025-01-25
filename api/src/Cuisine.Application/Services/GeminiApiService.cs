@@ -27,7 +27,6 @@
 
 using System.Text;
 using System.Text.Json;
-using Cuisine.Application.DTOs.Mappers;
 using Cuisine.Application.DTOs;
 using Cuisine.Application.Interfaces;
 using Cuisine.Domain.Entities;
@@ -38,9 +37,9 @@ namespace Cuisine.Application.Services;
 
 public class GeminiApiService(HttpClient httpClient, IIngredientRepository ingredientRepository, IUnitRepository unitRepository)
 {
-    public async Task<RecipeDTO?> GenerateContentAsync(string apiKey, string prompt, string? filePath = null)
+    public async Task<NewRecipeDTO?> GenerateContentAsync(string apiKey, string prompt, string? filePath = null)
     {
-        var recipe = new Recipe();
+        NewRecipeDTO? newRecipeDTO = null;
         var ingredients = await ingredientRepository.GetIngredientsAsync();
         var units = await unitRepository.GetUnitsAsync();
         try
@@ -66,9 +65,6 @@ public class GeminiApiService(HttpClient httpClient, IIngredientRepository ingre
             var jsonPayload = JsonSerializer.Serialize(payload);
             var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
             string jsonRequest = JsonSerializer.Serialize(requestContent);
-            Console.WriteLine("JSON Request:");
-            Console.WriteLine(jsonRequest);
-            Console.WriteLine(jsonPayload);
             var response = await httpClient.PostAsync(url, requestContent);
             if (!response.IsSuccessStatusCode)
             {
@@ -85,17 +81,9 @@ public class GeminiApiService(HttpClient httpClient, IIngredientRepository ingre
 
                 if (jsonRecipe is not null)
                 {
-                    recipe.Name = jsonRecipe.Name;
-                    recipe.Description = jsonRecipe.Description;
-                    recipe.Steps = JsonSerializer.Serialize(jsonRecipe.Steps);
-                    recipe.PreparationTime = jsonRecipe.PreparationTime;
-                    recipe.CookingTime = jsonRecipe.CookingTime;
-                    recipe.RestTime = jsonRecipe.RestTime;
-                    recipe.Portions = jsonRecipe.Portions;
-                    recipe.Advice = jsonRecipe.Advice;
-                    recipe.RecipeIngredients = [];
+                    List<NewRecipeIngredientDTO> recipeIngredients = [];
 
-                    if (jsonRecipe?.RecipeIngredients is not null)
+                    if (jsonRecipe.RecipeIngredients is not null)
                     {
                         foreach (var recipeIngredient in jsonRecipe.RecipeIngredients)
                         {
@@ -131,22 +119,32 @@ public class GeminiApiService(HttpClient httpClient, IIngredientRepository ingre
                                         quantityValue = intQuantity;
                                     }
 
-                                    var newRecipeIngredient = new RecipeIngredient()
+                                    var newRecipeIngredientDTO = new NewRecipeIngredientDTO()
                                     {
-                                        IngredientId = (Guid)ingredient.Id,
+                                        IngredientId = ingredient.Id,
                                         Quantity = quantityValue,
                                         UnitId = unit?.Id ?? null,
                                         Optional = recipeIngredient.Optional ?? false
                                     };
-                                    recipe.RecipeIngredients.Add(newRecipeIngredient);
+                                    recipeIngredients.Add(newRecipeIngredientDTO);
                                 }
                             }
 
                         }
                     }
+                    newRecipeDTO = new NewRecipeDTO(){
+                        Name = jsonRecipe.Name,
+                        Description = jsonRecipe.Description,
+                        Steps = jsonRecipe.Steps,
+                        PreparationTime = jsonRecipe.PreparationTime,
+                        CookingTime = jsonRecipe.CookingTime,
+                        RestTime = jsonRecipe.RestTime,
+                        Portions = jsonRecipe.Portions,
+                        Advice = jsonRecipe.Advice,
+                        RecipeIngredients = recipeIngredients
+                    };
                 }
-                var recipeDTO = recipe.ToRecipeDTO();
-                return recipeDTO;
+                return newRecipeDTO;
             }
             catch (JsonException ex)
             {
@@ -163,7 +161,7 @@ public class GeminiApiService(HttpClient httpClient, IIngredientRepository ingre
         }
     }
 
-    private List<object> Contents(string prompt, string? filePath = null)
+    private static List<object> Contents(string prompt, string? filePath = null)
     {
         var contents = new List<object>
         {

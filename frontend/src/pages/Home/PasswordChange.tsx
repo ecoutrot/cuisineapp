@@ -25,8 +25,8 @@ function PasswordChange() {
           setErrorMessage("Erreur lors de la connexion. Veuillez réessayer.");
           return;
         }
-        setToken(token);
-        localStorage.setItem("token", token);
+        setToken(token.accessToken);
+        localStorage.setItem("token", token.accessToken);
         await navigate("/");
       })
       .catch((error) => {

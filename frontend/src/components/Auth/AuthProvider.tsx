@@ -52,20 +52,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           try {
             const newToken = await fetchForRefreshToken();
             if (!newToken) {
-              logout();
-              void navigate("/login");
               return;
             }
-            setToken(newToken);
-            localStorage.setItem("token", newToken);
+            setToken(newToken.accessToken);
+            localStorage.setItem("token", newToken.accessToken);
             return api(originalRequest);
           } catch (err) {
-            if ((err as AxiosError<{ message: string }>).response?.data?.message === "Invalid refresh token.") {
-              void navigate("/login");
-              return;
-            }
             return Promise.reject(err as Error);
           }
+        }
+        if (error.response?.status === 400 && error.response?.data == "Invalid refresh token.") {
+          void navigate("/login");
         }
         return Promise.reject(error as Error);
       }
