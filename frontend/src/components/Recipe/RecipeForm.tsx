@@ -129,7 +129,7 @@ function RecipeForm({ recipe, ingredients, units, recipeCategories }: { recipe: 
       for (let i = 0; i < recipeIngredients.length; i++) {
         const id = toStringOrNull(formData.get(`rIngredients[${i}].id`) as string);
         const unitId = toStringOrNull(formData.get(`rIngredients[${i}].unitId`) as string);
-        const quantity = toFloatOrNull(formData.get(`rengredients[${i}].quantity`) as string);
+        const quantity = toFloatOrNull(formData.get(`rIngredients[${i}].quantity`) as string);
         const ingredientId = toStringOrNull(formData.get(`rIngredients[${i}].ingredientId`) as string);
         const optional = recipeIngredients[i].optional;
         if (id || unitId || quantity || ingredientId) {

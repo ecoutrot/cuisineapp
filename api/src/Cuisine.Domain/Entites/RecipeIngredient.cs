@@ -10,7 +10,7 @@ public class RecipeIngredient
     public Guid IngredientId { get; set; }
     public Ingredient? Ingredient { get; set; }
     [Column(TypeName = "decimal(18, 2)")]
-    public decimal Quantity { get; set; }
+    public decimal? Quantity { get; set; }
     public Guid? UnitId { get; set; }
     public Unit? Unit { get; set; }
     public bool? Optional { get; set; }
