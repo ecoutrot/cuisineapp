@@ -8,3 +8,5 @@ docker exec -it sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Pas
 ./api/src/Cuisine.Api dotnet run
 .frontend npm instll
 .frontend npm run dev
+
+GeminiApiKey : https://aistudio.google.com/
