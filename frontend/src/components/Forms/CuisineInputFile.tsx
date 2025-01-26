@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { MdUploadFile } from "react-icons/md";
-import { fileSizeFormat } from "../../Helpers/Parsers";
+import { fileSizeFormat } from "../../helpers/Parsers";
 
 function CuisineInputFile({
   defaultValue,
