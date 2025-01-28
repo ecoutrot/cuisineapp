@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Cuisine.Application.Interfaces;
 using Cuisine.Application.Services;
 using Cuisine.Infrastructure.Persistence.Data;
@@ -84,7 +85,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPromptService, PromptService>();
 builder.Services.AddHttpClient<GeminiApiService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+    });
 
 builder.Services.AddCors(options =>
 {

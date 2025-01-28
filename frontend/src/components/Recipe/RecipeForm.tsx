@@ -11,7 +11,7 @@ import { nanoid } from "nanoid";
 import CuisineTextarea from "../Forms/CuisineTextarea";
 import CuisineInputText from "../Forms/CuisineInputText";
 import CuisineSelect from "../Forms/CuisineSelect";
-import { toFloatOrNull, toIntOrNull, toStringOrNull } from "../../Helpers/Parsers";
+import { toFloatOrNull, toIntOrNull, toStringOrNull } from "../../helpers/Parsers";
 import { RecipeCategory } from "../../types/RecipeCategory";
 import { BsStars } from "react-icons/bs";
 import { FaRegTrashCan } from "react-icons/fa6";
@@ -129,7 +129,7 @@ function RecipeForm({ recipe, ingredients, units, recipeCategories }: { recipe: 
       for (let i = 0; i < recipeIngredients.length; i++) {
         const id = toStringOrNull(formData.get(`rIngredients[${i}].id`) as string);
         const unitId = toStringOrNull(formData.get(`rIngredients[${i}].unitId`) as string);
-        const quantity = toFloatOrNull(formData.get(`rengredients[${i}].quantity`) as string);
+        const quantity = toFloatOrNull(formData.get(`rIngredients[${i}].quantity`) as string);
         const ingredientId = toStringOrNull(formData.get(`rIngredients[${i}].ingredientId`) as string);
         const optional = recipeIngredients[i].optional;
         if (id || unitId || quantity || ingredientId) {

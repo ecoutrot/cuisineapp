@@ -11,7 +11,7 @@ import { nanoid } from "nanoid";
 import CuisineTextarea from "../Forms/CuisineTextarea";
 import CuisineInputText from "../Forms/CuisineInputText";
 import CuisineSelect from "../Forms/CuisineSelect";
-import { toFloatOrNull, toIntOrNull, toStringOrNull } from "../../Helpers/Parsers";
+import { toFloatOrNull, toIntOrNull, toStringOrNull } from "../../helpers/Parsers";
 import { RecipeCategory } from "../../types/RecipeCategory";
 import { BsStars } from "react-icons/bs";
 import { FaRegTrashCan } from "react-icons/fa6";
