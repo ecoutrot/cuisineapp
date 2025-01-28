@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Cuisine.Application.Interfaces;
 using Cuisine.Application.Services;
+using Cuisine.Domain.Interfaces;
 using Cuisine.Infrastructure.Persistence.Data;
 using Cuisine.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
