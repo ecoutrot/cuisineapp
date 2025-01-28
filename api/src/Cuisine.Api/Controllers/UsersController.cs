@@ -33,12 +33,11 @@ public class UsersController(IUserService userService) : ControllerBase
     {
         try
         {
-            var user = await userService.GetUserByIdAsync(id);
-            if (user is null)
+            var userDTO = await userService.GetUserByIdAsync(id);
+            if (userDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var userDTO = user.ToUserDTO();
             return TypedResults.Ok(userDTO);
         }
         catch (Exception ex)

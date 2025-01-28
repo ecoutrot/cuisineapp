@@ -30,7 +30,7 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<Results<Ok<RecipeDTO[]>,UnauthorizedHttpResult,BadRequest<string>>> GetAll(int? page = null, int? limit = null, string? search = null)
+    public async Task<Results<Ok<List<RecipeDTO>>,UnauthorizedHttpResult,BadRequest<string>>> GetAll(int? page = null, int? limit = null, string? search = null)
     {
         try
         {
@@ -39,8 +39,7 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
             {
                 return TypedResults.Unauthorized();
             }
-            var recipes = await recipeService.GetRecipesAsync((Guid)userId, page, limit, search);
-            var recipeDTOs = recipes?.Select(recipe => recipe.ToRecipeDTO()).ToArray();
+            var recipeDTOs = await recipeService.GetRecipesAsync((Guid)userId, page, limit, search);
             return TypedResults.Ok(recipeDTOs ?? []);
         }
         catch (Exception ex)
@@ -54,12 +53,11 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
     {
         try
         {
-            var recipe = await recipeService.GetRecipeByIdAsync(id);
-            if (recipe is null)
+            var recipeDTO = await recipeService.GetRecipeByIdAsync(id);
+            if (recipeDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var recipeDTO = recipe.ToRecipeDTO();
             return TypedResults.Ok(recipeDTO);
         }
         catch (Exception ex)
@@ -73,15 +71,12 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
     {
         try
         {
-            var recipe = newRecipeDTO.ToNewEntity();
             var userId = GetUserId(User);
             if (userId is null || (Guid)userId == Guid.Empty)
             {
                 return TypedResults.Unauthorized();
             }
-            recipe.UserId = userId;
-            var addedRecipe = await recipeService.AddRecipeAsync(recipe);
-            var addedRecipeDTO = addedRecipe?.ToRecipeDTO();
+            var addedRecipeDTO = await recipeService.AddRecipeAsync(newRecipeDTO, (Guid)userId);
             return TypedResults.Created(nameof(GetById), addedRecipeDTO);
         }
         catch (Exception ex)
@@ -95,8 +90,7 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
     {
         try
         {
-            var recipe = recipeDTO.ToEntity();
-            if (id != recipe.Id)
+            if (id != recipeDTO.Id)
             {
                 return TypedResults.BadRequest("Id in the route does not match the id in the body");
             }
@@ -106,12 +100,11 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
             {
                 return TypedResults.Unauthorized();
             }
-            var updatedRecipe = await recipeService.UpdateRecipeAsync(id, recipe);
-            if (updatedRecipe is null)
+            var updatedRecipeDTO = await recipeService.UpdateRecipeAsync(id, recipeDTO);
+            if (updatedRecipeDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var updatedRecipeDTO = updatedRecipe.ToRecipeDTO();
             return TypedResults.Ok(updatedRecipeDTO);
         }
         catch (Exception ex)

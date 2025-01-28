@@ -1,8 +1,8 @@
-using Cuisine.Domain.Entities;
+using Cuisine.Application.DTOs;
 
 namespace Cuisine.Application.Interfaces;
 
 public interface IUserService
 {
-    Task<User?> GetUserByIdAsync(Guid id);
+    Task<UserDTO?> GetUserByIdAsync(Guid id);
 }

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Cuisine.Application.DTOs.Mappers;
 using Cuisine.Application.Interfaces;
+using Cuisine.Domain.Interfaces;
 
 namespace Cuisine.Application.Services;
 

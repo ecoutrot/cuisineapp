@@ -29,12 +29,11 @@ public class RecipeCategoriesController(IRecipeCategoryService recipeCategorySer
     }
 
     [HttpGet]
-    public async Task<Results<Ok<RecipeCategoryDTO[]>,BadRequest<string>>> GetAll(int? page = null, int? limit = null)
+    public async Task<Results<Ok<List<RecipeCategoryDTO>>,BadRequest<string>>> GetAll(int? page = null, int? limit = null)
     {
         try
         {
-            var recipeCategories = await recipeCategoryService.GetRecipeCategoriesAsync(page, limit);
-            var recipeCategoryDTOs = recipeCategories?.Select(recipeCategory => recipeCategory.ToRecipeCategoryDTO()).ToArray();
+            var recipeCategoryDTOs = await recipeCategoryService.GetRecipeCategoriesAsync(page, limit);
             return TypedResults.Ok(recipeCategoryDTOs ?? []);
         }
         catch (Exception ex)
@@ -48,12 +47,11 @@ public class RecipeCategoriesController(IRecipeCategoryService recipeCategorySer
     {
         try
         {
-            var recipeCategory = await recipeCategoryService.GetRecipeCategoryByIdAsync(id);
-            if (recipeCategory is null)
+            var recipeCategoryDTO = await recipeCategoryService.GetRecipeCategoryByIdAsync(id);
+            if (recipeCategoryDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var recipeCategoryDTO = recipeCategory.ToRecipeCategoryDTO();
             return TypedResults.Ok(recipeCategoryDTO);
         }
         catch (Exception ex)
@@ -67,9 +65,7 @@ public class RecipeCategoriesController(IRecipeCategoryService recipeCategorySer
     {
         try
         {
-            var recipeCategory = newRecipeCategoryDTO.ToNewEntity();
-            var addedRecipeCategory = await recipeCategoryService.AddRecipeCategoryAsync(recipeCategory);
-            var addedRecipeCategoryDTO = addedRecipeCategory?.ToRecipeCategoryDTO();
+            var addedRecipeCategoryDTO = await recipeCategoryService.AddRecipeCategoryAsync(newRecipeCategoryDTO);
             return TypedResults.Created(nameof(GetById), addedRecipeCategoryDTO);
         }
         catch (Exception ex)
@@ -83,13 +79,11 @@ public class RecipeCategoriesController(IRecipeCategoryService recipeCategorySer
     {
         try
         {
-            var recipeCategory = recipeCategoryDTO.ToEntity();
-            var updatedRecipeCategory = await recipeCategoryService.UpdateRecipeCategoryAsync(id, recipeCategory);
-            if (updatedRecipeCategory is null)
+            var updatedRecipeCategoryDTO = await recipeCategoryService.UpdateRecipeCategoryAsync(id, recipeCategoryDTO);
+            if (updatedRecipeCategoryDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var updatedRecipeCategoryDTO = updatedRecipeCategory.ToRecipeCategoryDTO();
             return TypedResults.Ok(updatedRecipeCategoryDTO);
         }
         catch (Exception ex)

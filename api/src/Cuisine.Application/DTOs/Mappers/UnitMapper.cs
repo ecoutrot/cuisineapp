@@ -4,7 +4,7 @@ namespace Cuisine.Application.DTOs.Mappers;
 
 public static class UnitMapper
 {
-    public static UnitDTO ToUnitDTO(this Unit unit)
+    public static UnitDTO ToDTO(this Unit unit)
     {
         return new UnitDTO
         {

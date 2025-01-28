@@ -4,7 +4,7 @@ using Cuisine.Application.Helpers;
 
 namespace Cuisine.Application.DTOs;
 
-public sealed record RefreshTokenRequestDto {
+public sealed record RefreshTokenRequestDTO {
     [Required]
     [JsonPropertyName("userId")]
     [NotEmptyGuidValidation]

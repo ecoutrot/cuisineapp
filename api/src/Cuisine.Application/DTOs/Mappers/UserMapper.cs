@@ -4,7 +4,7 @@ namespace Cuisine.Application.DTOs.Mappers;
 
 public static class UserMapper
 {
-    public static UserDTO ToUserDTO(this User user)
+    public static UserDTO ToDTO(this User user)
     {
         return new UserDTO
         {

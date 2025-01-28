@@ -6,11 +6,11 @@ namespace Cuisine.Application.Interfaces;
 
 public interface IAuthService
 {
-    Task<TokenDto?> RegisterAsync(UserLoginDTO userLoginDTO);
-    Task<TokenDto?> LoginAsync(UserLoginDTO userLoginDTO);
-    Task<TokenDto?> RefreshTokensAsync(RefreshTokenRequestDto refreshTokenRequestDto);
-    Task RemoveRefreshTokenAsync(Guid? userId, string? refreshToken);
-    void SetTokenCookie(TokenDto tokenDto, HttpContext httpContext);
+    Task<TokenDTO?> RegisterAsync(UserLoginDTO userLoginDTO);
+    Task<TokenDTO?> LoginAsync(UserLoginDTO userLoginDTO);
+    Task<TokenDTO?> RefreshTokensAsync(RefreshTokenRequestDTO refreshTokenRequestDTO);
+    Task RemoveRefreshTokenAsync(Guid userId, string refreshToken);
+    void SetTokenCookie(TokenDTO tokenDTO, HttpContext httpContext);
     void RemoveTokenCookie(HttpContext httpContext);
-    Task<TokenDto?> ChangePasswordAsync(string oldPassword, string newPassword, Guid userId);
+    Task<TokenDTO?> ChangePasswordAsync(string oldPassword, string newPassword, Guid userId);
 }

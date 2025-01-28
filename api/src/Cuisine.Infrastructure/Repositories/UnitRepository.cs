@@ -1,8 +1,7 @@
-using Cuisine.Application.Interfaces;
 using Cuisine.Domain.Entities;
 using Cuisine.Infrastructure.Persistence.Data;
-using Cuisine.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Cuisine.Domain.Interfaces;
 
 namespace Cuisine.Infrastructure.Repositories;
 

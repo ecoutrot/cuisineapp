@@ -5,14 +5,14 @@ namespace Cuisine.Application.DTOs.Mappers;
 
 public static class RecipeMapper
 {
-    public static RecipeDTO ToRecipeDTO(this Recipe recipe)
+    public static RecipeDTO ToDTO(this Recipe recipe)
     {
         return new RecipeDTO
         {
             Id = recipe.Id,
             Name = recipe.Name,
             Description = recipe.Description,
-            RecipeIngredients = recipe.RecipeIngredients?.Select(ri => ri.ToRecipeIngredientDTO()).ToList(),
+            RecipeIngredients = recipe.RecipeIngredients?.Select(ri => ri.ToDTO()).ToList(),
             Steps = JsonSerializer.Deserialize<List<string>>(recipe.Steps ?? string.Empty),
             RecipeCategoryId = recipe.RecipeCategoryId,
             PreparationTime = recipe.PreparationTime,
@@ -25,6 +25,29 @@ public static class RecipeMapper
             Calories = recipe.Calories,
             Advice = recipe.Advice,
             UserId = recipe.UserId
+        };
+    }
+
+    public static NewRecipeDTO ToRecipeDTO(NewRecipeDTO newRecipeDTO, Guid userId)
+    {
+        return new NewRecipeDTO
+        {
+            Id = Guid.NewGuid(),
+            Name = newRecipeDTO.Name,
+            Description = newRecipeDTO.Description,
+            RecipeIngredients = newRecipeDTO.RecipeIngredients,
+            Steps = newRecipeDTO.Steps,
+            RecipeCategoryId = newRecipeDTO.RecipeCategoryId,
+            PreparationTime = newRecipeDTO.PreparationTime,
+            CookingTime = newRecipeDTO.CookingTime,
+            RestTime = newRecipeDTO.RestTime,
+            Portions = newRecipeDTO.Portions,
+            Difficulty = newRecipeDTO.Difficulty,
+            Price = newRecipeDTO.Price,
+            CookingType = newRecipeDTO.CookingType,
+            Calories = newRecipeDTO.Calories,
+            Advice = newRecipeDTO.Advice,
+            UserId = userId
         };
     }
 

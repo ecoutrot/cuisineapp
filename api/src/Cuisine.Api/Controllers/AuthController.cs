@@ -27,8 +27,9 @@ public class AuthController(IAuthService authService) : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPost("register")]
-    public async Task<Results<Ok<TokenResponseDto>, BadRequest<string>>> Register(UserLoginDTO userLoginDTO)
+    public async Task<Results<Ok<TokenResponseDTO>, BadRequest<string>>> Register(UserLoginDTO userLoginDTO)
     {
         try
         {
@@ -39,8 +40,8 @@ public class AuthController(IAuthService authService) : ControllerBase
             if (result is null)
                 return TypedResults.BadRequest("Invalid username or password.");
             authService.SetTokenCookie(result, HttpContext);
-            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
-            return TypedResults.Ok(tokenResponseDto);
+            var tokenResponseDTO = new TokenResponseDTO(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDTO);
         }
         catch (Exception ex)
         {
@@ -49,7 +50,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<Results<Ok<TokenResponseDto>, BadRequest<string>>> Login(UserLoginDTO userLoginDTO)
+    public async Task<Results<Ok<TokenResponseDTO>, BadRequest<string>>> Login(UserLoginDTO userLoginDTO)
     {
         try
         {
@@ -58,8 +59,8 @@ public class AuthController(IAuthService authService) : ControllerBase
                 return TypedResults.BadRequest("Invalid username or password.");
 
             authService.SetTokenCookie(result, HttpContext);
-            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
-            return TypedResults.Ok(tokenResponseDto);
+            var tokenResponseDTO = new TokenResponseDTO(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDTO);
         }
         catch (Exception ex)
         {
@@ -68,7 +69,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<Results<Ok<TokenResponseDto>, BadRequest<string>>> RefreshToken()
+    public async Task<Results<Ok<TokenResponseDTO>, BadRequest<string>>> RefreshToken()
     {
         try
         {
@@ -79,20 +80,20 @@ public class AuthController(IAuthService authService) : ControllerBase
                 authService.RemoveTokenCookie(HttpContext);
                 return TypedResults.BadRequest("Invalid refresh token.");
             }
-            var refreshTokenRequestDto = new RefreshTokenRequestDto()
+            var refreshTokenRequestDTO = new RefreshTokenRequestDTO()
             {
                 UserId = new Guid(userId),
                 RefreshToken = refreshToken
             };
-            var result = await authService.RefreshTokensAsync(refreshTokenRequestDto);
+            var result = await authService.RefreshTokensAsync(refreshTokenRequestDTO);
             if (result is null || result.AccessToken is null || result.RefreshToken is null)
             {
                 authService.RemoveTokenCookie(HttpContext);
                 return TypedResults.BadRequest("Invalid refresh token.");
             }
             authService.SetTokenCookie(result, HttpContext);
-            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
-            return TypedResults.Ok(tokenResponseDto);
+            var tokenResponseDTO = new TokenResponseDTO(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDTO);
         }
         catch (Exception ex)
         {
@@ -102,7 +103,7 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     [Authorize]
     [HttpPost("passwordchange")]
-    public async Task<Results<Ok<TokenResponseDto>,UnauthorizedHttpResult,BadRequest<string>>> PasswordChange(PasswordDTO passwordDTO)
+    public async Task<Results<Ok<TokenResponseDTO>,UnauthorizedHttpResult,BadRequest<string>>> PasswordChange(PasswordDTO passwordDTO)
     {
         try
         {
@@ -116,8 +117,8 @@ public class AuthController(IAuthService authService) : ControllerBase
                 return TypedResults.BadRequest("Password change failed.");
 
             authService.SetTokenCookie(result, HttpContext);
-            var tokenResponseDto = new TokenResponseDto(){ AccessToken = result.AccessToken };
-            return TypedResults.Ok(tokenResponseDto);
+            var tokenResponseDTO = new TokenResponseDTO(){ AccessToken = result.AccessToken };
+            return TypedResults.Ok(tokenResponseDTO);
         }
         catch (Exception ex)
         {
@@ -134,7 +135,7 @@ public class AuthController(IAuthService authService) : ControllerBase
             Response.Cookies.Delete("userId");
             var refreshToken = Request.Cookies["refreshToken"];
             Response.Cookies.Delete("refreshToken");
-            if (!string.IsNullOrEmpty(userId))
+            if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(refreshToken))
             {
                 await authService.RemoveRefreshTokenAsync(new Guid(userId), refreshToken);
             }

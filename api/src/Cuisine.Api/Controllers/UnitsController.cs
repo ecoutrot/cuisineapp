@@ -29,12 +29,11 @@ public class UnitsController(IUnitService unitService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<Results<Ok<UnitDTO[]>,BadRequest<string>>> GetAll(int? page = null, int? limit = null)
+    public async Task<Results<Ok<List<UnitDTO>>,BadRequest<string>>> GetAll(int? page = null, int? limit = null)
     {
         try
         {
-            var units = await unitService.GetUnitsAsync(page, limit);
-            var unitDTOs = units?.Select(unit => unit.ToUnitDTO()).ToArray();
+            var unitDTOs = await unitService.GetUnitsAsync(page, limit);
             return TypedResults.Ok(unitDTOs ?? []);
         }
         catch (Exception ex)
@@ -48,12 +47,11 @@ public class UnitsController(IUnitService unitService) : ControllerBase
     {
         try
         {
-            var unit = await unitService.GetUnitByIdAsync(id);
-            if (unit is null)
+            var unitDTO = await unitService.GetUnitByIdAsync(id);
+            if (unitDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var unitDTO = unit.ToUnitDTO();
             return TypedResults.Ok(unitDTO);
         }
         catch (Exception ex)
@@ -67,9 +65,7 @@ public class UnitsController(IUnitService unitService) : ControllerBase
     {
         try
         {
-            var unit = newUnitDTO.ToNewEntity();
-            var addedUnit = await unitService.AddUnitAsync(unit);
-            var addedUnitDTO = addedUnit?.ToUnitDTO();
+            var addedUnitDTO = await unitService.AddUnitAsync(newUnitDTO);
             return TypedResults.Created(nameof(GetById), addedUnitDTO);
         }
         catch (Exception ex)
@@ -83,13 +79,11 @@ public class UnitsController(IUnitService unitService) : ControllerBase
     {
         try
         {
-            var unit = unitDTO.ToEntity();
-            var updatedUnit = await unitService.UpdateUnitAsync(id, unit);
-            if (updatedUnit is null)
+            var updatedUnitDTO = await unitService.UpdateUnitAsync(id, unitDTO);
+            if (updatedUnitDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var updatedUnitDTO = updatedUnit.ToUnitDTO();
             return TypedResults.Ok(updatedUnitDTO);
         }
         catch (Exception ex)

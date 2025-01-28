@@ -4,7 +4,7 @@ namespace Cuisine.Application.DTOs.Mappers;
 
 public static class RecipeCategoryMapper
 {
-    public static RecipeCategoryDTO ToRecipeCategoryDTO(this RecipeCategory recipeCategory)
+    public static RecipeCategoryDTO ToDTO(this RecipeCategory recipeCategory)
     {
         return new RecipeCategoryDTO
         {

@@ -1,6 +1,6 @@
 using Cuisine.Domain.Entities;
 
-namespace Cuisine.Application.Interfaces;
+namespace Cuisine.Domain.Interfaces;
 
 public interface IRecipeCategoryRepository
 {

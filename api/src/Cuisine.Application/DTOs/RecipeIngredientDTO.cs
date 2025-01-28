@@ -14,7 +14,7 @@ public sealed record RecipeIngredientDTO {
     public Guid IngredientId { get; init; }
 
     [JsonPropertyName("quantity")]
-    public decimal Quantity { get; init; }
+    public decimal? Quantity { get; init; }
 
     [JsonPropertyName("unitId")]
     public Guid? UnitId { get; init; }
@@ -22,7 +22,6 @@ public sealed record RecipeIngredientDTO {
     [JsonPropertyName("optional")]
     public bool? Optional { get; init; }
 }
-
 
 public sealed record NewRecipeIngredientDTO {
     [JsonPropertyName("id")]
@@ -32,7 +31,7 @@ public sealed record NewRecipeIngredientDTO {
     public Guid IngredientId { get; init; }
 
     [JsonPropertyName("quantity")]
-    public decimal Quantity { get; init; }
+    public decimal? Quantity { get; init; }
 
     [JsonPropertyName("unitId")]
     public Guid? UnitId { get; init; }

@@ -1,6 +1,5 @@
 using Cuisine.Application.DTOs;
-using Cuisine.Application.Interfaces;
-using Cuisine.Domain.Entities;
+using Cuisine.Domain.Interfaces;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;

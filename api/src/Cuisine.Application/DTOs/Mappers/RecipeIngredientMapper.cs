@@ -4,7 +4,7 @@ namespace Cuisine.Application.DTOs.Mappers;
 
 public static class RecipeIngredientMapper
 {
-    public static RecipeIngredientDTO ToRecipeIngredientDTO(this RecipeIngredient recipeIngredient)
+    public static RecipeIngredientDTO ToDTO(this RecipeIngredient recipeIngredient)
     {
         return new RecipeIngredientDTO
         {

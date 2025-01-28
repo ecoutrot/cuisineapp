@@ -4,7 +4,7 @@ using Cuisine.Application.Helpers;
 
 namespace Cuisine.Application.DTOs;
 
-public sealed record TokenDto 
+public sealed record TokenDTO 
 {
     [Required]
     [JsonPropertyName("userId")]

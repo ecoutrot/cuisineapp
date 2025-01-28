@@ -29,12 +29,11 @@ public class IngredientsController(IIngredientService ingredientService) : Contr
     }
 
     [HttpGet]
-    public async Task<Results<Ok<IngredientDTO[]>,BadRequest<string>>> GetAll(int? page = null, int? limit = null, string? search = null)
+    public async Task<Results<Ok<List<IngredientDTO>>,BadRequest<string>>> GetAll(int? page = null, int? limit = null, string? search = null)
     {
         try
         {
-            var ingredients = await ingredientService.GetIngredientsAsync(page, limit, search);
-            var ingredientDTOs = ingredients?.Select(ingredient => ingredient.ToIngredientDTO()).ToArray();
+            var ingredientDTOs = await ingredientService.GetIngredientsAsync(page, limit, search);
             return TypedResults.Ok(ingredientDTOs ?? []);
         }
         catch (Exception ex)
@@ -48,12 +47,11 @@ public class IngredientsController(IIngredientService ingredientService) : Contr
     {
         try
         {
-            var ingredient = await ingredientService.GetIngredientByIdAsync(id);
-            if (ingredient is null)
+            var ingredientDTO = await ingredientService.GetIngredientByIdAsync(id);
+            if (ingredientDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var ingredientDTO = ingredient.ToIngredientDTO();
             return TypedResults.Ok(ingredientDTO);
         }
         catch (Exception ex)
@@ -67,9 +65,7 @@ public class IngredientsController(IIngredientService ingredientService) : Contr
     {
         try
         {
-            var ingredient = newIngredientDTO.ToNewEntity();
-            var addedIngredient = await ingredientService.AddIngredientAsync(ingredient);
-            var addedIngredientDTO = addedIngredient?.ToIngredientDTO();
+            var addedIngredientDTO = await ingredientService.AddIngredientAsync(newIngredientDTO);
             return TypedResults.Created(nameof(GetById), addedIngredientDTO);
         }
         catch (Exception ex)
@@ -83,13 +79,11 @@ public class IngredientsController(IIngredientService ingredientService) : Contr
     {
         try
         {
-            var ingredient = ingredientDTO.ToEntity();
-            var updatedIngredient = await ingredientService.UpdateIngredientAsync(id, ingredient);
-            if (updatedIngredient is null)
+            var updatedIngredientDTO = await ingredientService.UpdateIngredientAsync(id, ingredientDTO);
+            if (updatedIngredientDTO is null)
             {
                 return TypedResults.NotFound();
             }
-            var updatedIngredientDTO = updatedIngredient.ToIngredientDTO();
             return TypedResults.Ok(updatedIngredientDTO);
         }
         catch (Exception ex)

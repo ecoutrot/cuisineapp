@@ -1,7 +1,5 @@
-using Cuisine.Application.DTOs;
 using Cuisine.Domain.Entities;
 using Cuisine.Infrastructure.Persistence.Data;
-using Cuisine.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,19 +8,21 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Cuisine.Domain.Interfaces;
+using Cuisine.Domain.Models;
 
 namespace Cuisine.Infrastructure.Repositories;
 
 public class AuthRepository(UserDbContext context, IConfiguration configuration) : IAuthRepository
 {
-    public async Task<TokenDto?> LoginAsync(UserLoginDTO userLoginDTO)
+    public async Task<Token?> LoginAsync(string username, string password)
     {
         try
         {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Username == userLoginDTO.Username);
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user is null)
                 return null;
-            if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, userLoginDTO.Password)
+            if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, password)
                 == PasswordVerificationResult.Failed)
                 return null;
 
@@ -34,7 +34,7 @@ public class AuthRepository(UserDbContext context, IConfiguration configuration)
         }
     }
 
-    private async Task<TokenDto> CreateTokenResponse(User user, string? refreshToken = null)
+    private async Task<Token> CreateTokenResponse(User user, string? refreshToken = null)
     {
         try
         {
@@ -43,7 +43,7 @@ public class AuthRepository(UserDbContext context, IConfiguration configuration)
             var RefreshToken = refreshToken ?? await GenerateAndSaveRefreshTokenAsync(user);
             if (userId == Guid.Empty || string.IsNullOrEmpty(AccessToken) || string.IsNullOrEmpty(RefreshToken))
                 throw new ArgumentNullException(nameof(user));
-            return new TokenDto
+            return new Token
             {
                 UserId = userId,
                 AccessToken = AccessToken,
@@ -56,18 +56,18 @@ public class AuthRepository(UserDbContext context, IConfiguration configuration)
         }
     }
 
-    public async Task<TokenDto?> RegisterAsync(UserLoginDTO userLoginDTO)
+    public async Task<Token?> RegisterAsync(string username, string password)
     {
         try
         {
-            if (await context.Users.AnyAsync(u => u.Username == userLoginDTO.Username))
+            if (await context.Users.AnyAsync(u => u.Username == username))
                 return null;
 
             var user = new User { Id = Guid.NewGuid() };
             var hashedPassword = new PasswordHasher<User>()
-                .HashPassword(user, userLoginDTO.Password);
+                .HashPassword(user, password);
 
-            user.Username = userLoginDTO.Username;
+            user.Username = username;
             user.PasswordHash = hashedPassword;
 
             context.Users.Add(user);
@@ -81,21 +81,21 @@ public class AuthRepository(UserDbContext context, IConfiguration configuration)
         }
     }
 
-    public async Task<TokenDto?> RefreshTokensAsync(RefreshTokenRequestDto refreshTokenRequestDto)
+    public async Task<Token?> RefreshTokensAsync(Guid userId, string refreshToken)
     {
         try
         {
-            var user = await ValidateRefreshTokenAsync(refreshTokenRequestDto.UserId, refreshTokenRequestDto.RefreshToken);
+            var user = await ValidateRefreshTokenAsync(userId, refreshToken);
             if (user is null)
                 return null;
-            var tokenHash = ToHashedToken(refreshTokenRequestDto.RefreshToken);
+            var tokenHash = ToHashedToken(refreshToken);
             var oldRefreshToken = await context.RefreshTokens
-                .FirstOrDefaultAsync(rt => rt.UserId == refreshTokenRequestDto.UserId && rt.TokenHash == tokenHash);
+                .FirstOrDefaultAsync(rt => rt.UserId == userId && rt.TokenHash == tokenHash);
             if (oldRefreshToken is null)
                 return null;
-            // await RemoveRefreshTokenAsync(refreshTokenRequestDto.UserId, refreshTokenRequestDto.RefreshToken);
-            var refreshToken = await GenerateAndSaveRefreshTokenAsync(user);
-            return await CreateTokenResponse(user, refreshToken);
+            // await RemoveRefreshTokenAsyncuserId, refreshToken);
+            var newRefreshToken = await GenerateAndSaveRefreshTokenAsync(user);
+            return await CreateTokenResponse(user, newRefreshToken);
         }
         catch (Exception)
         {
@@ -195,11 +195,11 @@ public class AuthRepository(UserDbContext context, IConfiguration configuration)
         }
     }
 
-    public async Task RemoveRefreshTokenAsync(Guid? userId, string? refreshToken)
+    public async Task RemoveRefreshTokenAsync(Guid userId, string refreshToken)
     {
         try
         {
-            if (userId is null || string.IsNullOrEmpty(refreshToken))
+            if (string.IsNullOrEmpty(refreshToken))
                 return;
             var tokenHash = ToHashedToken(refreshToken);
             var token = await context.RefreshTokens
@@ -220,7 +220,7 @@ public class AuthRepository(UserDbContext context, IConfiguration configuration)
         }
     }
 
-    public async Task<TokenDto?> ChangePasswordAsync(string oldPassword, string newPassword, Guid userId)
+    public async Task<Token?> ChangePasswordAsync(string oldPassword, string newPassword, Guid userId)
     {
         try
         {

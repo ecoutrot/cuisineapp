@@ -1,5 +1,5 @@
-using Cuisine.Application.Interfaces;
 using Cuisine.Domain.Entities;
+using Cuisine.Domain.Interfaces;
 using Cuisine.Infrastructure.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 

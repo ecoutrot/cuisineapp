@@ -32,6 +32,7 @@ using Cuisine.Application.Interfaces;
 using Cuisine.Domain.Entities;
 using Cuisine.Application.Helpers;
 using Cuisine.Domain.Models;
+using Cuisine.Domain.Interfaces;
 
 namespace Cuisine.Application.Services;
 
